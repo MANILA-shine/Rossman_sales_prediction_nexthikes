@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Predictions</title>
+</head>
+<body>
+    <h1>Model Predictions</h1>
+    <form id="prediction-form">
+        <label for="store_id">Store ID:</label>
+        <input type="number" id="store_id" name="store_id" required><br><br>
+    
+        <label for="is_holiday">Is Holiday:</label>
+        <input type="number" id="is_holiday" name="is_holiday" required><br><br>
+    
+        <label for="is_weekend">Is Weekend:</label>
+        <input type="number" id="is_weekend" name="is_weekend" required><br><br>
+    
+        <label for="is_promo">Is Promo:</label>
+        <input type="number" id="is_promo" name="is_promo" required><br><br>
+    
+        <label for="competition_distance">Competition Distance:</label>
+        <input type="number" id="competition_distance" name="competition_distance" step="any" required><br><br>
+    
+        <label for="competition_open_since_month">Competition Open Since Month:</label>
+        <input type="number" id="competition_open_since_month" name="competition_open_since_month" required><br><br>
+    
+        <label for="competition_open_since_year">Competition Open Since Year:</label>
+        <input type="number" id="competition_open_since_year" name="competition_open_since_year" required><br><br>
+    
+        <button type="submit">Predict</button>
+    </form>
+    <div id="prediction-result"></div>
+    
+
+    <script>
+        document.getElementById("prediction-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent form from submitting normally
+        
+            // Get input values from form
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+        
+            // Send a POST request to the Flask API
+            fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                // Display predictions in the prediction-result div
+                const predictionResult = document.getElementById("prediction-result");
+                predictionResult.innerHTML = JSON.stringify(result, null, 2);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+        </script>
+        
+</body>
+</html>
