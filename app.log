@@ -1,0 +1,63 @@
+2023-08-26 14:37:08,294 - INFO - This is an informational message.
+2023-08-26 14:37:08,296 - WARNING - This is a warning message.
+2023-08-26 14:37:08,298 - ERROR - This is an error message.
+2023-08-26 14:37:08,315 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 14:50:14,282 - INFO - This is an informational message.
+2023-08-26 14:50:14,282 - INFO - This is an informational message.
+2023-08-26 14:50:14,289 - WARNING - This is a warning message.
+2023-08-26 14:50:14,289 - WARNING - This is a warning message.
+2023-08-26 14:50:14,293 - ERROR - This is an error message.
+2023-08-26 14:50:14,293 - ERROR - This is an error message.
+2023-08-26 14:50:14,314 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 14:50:14,314 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 14:51:33,638 - INFO - This is an informational message.
+2023-08-26 14:51:33,638 - INFO - This is an informational message.
+2023-08-26 14:51:33,638 - INFO - This is an informational message.
+2023-08-26 14:51:33,645 - WARNING - This is a warning message.
+2023-08-26 14:51:33,645 - WARNING - This is a warning message.
+2023-08-26 14:51:33,645 - WARNING - This is a warning message.
+2023-08-26 14:51:33,650 - ERROR - This is an error message.
+2023-08-26 14:51:33,650 - ERROR - This is an error message.
+2023-08-26 14:51:33,650 - ERROR - This is an error message.
+2023-08-26 14:51:33,669 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 14:51:33,669 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 14:51:33,669 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_14768\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
+2023-08-26 16:34:55,470 - INFO - This is an informational message.
+2023-08-26 16:34:55,473 - WARNING - This is a warning message.
+2023-08-26 16:34:55,476 - ERROR - This is an error message.
+2023-08-26 16:34:55,518 - ERROR - Error occurred during 'do_something' function.
+Traceback (most recent call last):
+  File "C:\Users\manil\AppData\Local\Temp\ipykernel_17108\1588697528.py", line 11, in do_something
+    result = 10 / 0  # Trigger a ZeroDivisionError for demonstration
+             ~~~^~~
+ZeroDivisionError: division by zero
