@@ -1,77 +1,34 @@
-from flask import Flask, request, jsonify
-import mlflow
-import os
-import numpy as np
+from flask import Flask, render_template
+import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+import io
+import base64
 
 app = Flask(__name__)
 
-# Load the models from MLflow artifacts
-rf_model_uri = "runs:/5c7486e2f8464629945cb4a56a2225c6/rossman_sales_model"
-loaded_rf_model = mlflow.sklearn.load_model(rf_model_uri)
+@app.route('/')
+def index():
+    # Load the test predictions DataFrame
+    test_predictions_df = pd.read_csv(r"C:\Users\manil\ROSSMAN_SALES_PREDICTION_BY_MANILA\test_df.csv")
 
-# Load the trained LSTM model
-lstm_model_path = "lstm_model.pickle"
-if os.path.exists(lstm_model_path):
-    with open(lstm_model_path, "rb") as f:
-        loaded_lstm_model = pickle.load(f)
-else:
-    loaded_lstm_model = None
+    # Generate a plot and convert it to a base64-encoded image
+    plt.figure(figsize=(12, 6))
+    plt.plot(test_predictions_df['Date'], test_predictions_df['PredictedSalesPerCustomer'], label='Predicted SalesPerCustomer', color='blue')
+    plt.title('Predicted Sales Per Customer Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Predicted SalesPerCustomer')
+    plt.legend()
+    plt.grid(True)
 
+    # Save the plot to a BytesIO object and encode it as base64
+    img_buf = io.BytesIO()
+    plt.savefig(img_buf, format='png')
+    img_buf.seek(0)
+    img_data = base64.b64encode(img_buf.read()).decode('utf-8')
+    plt.close()
 
-@app.route("/", methods=["POST"])
-def predict():
-    try:
-        data = request.get_json()
+    # Pass the predictions and base64-encoded plot to the template
+    return render_template('index.html', predictions=test_predictions_df.to_html(), plot_data=img_data)
 
-        # Extract input data from JSON
-        store_id = int(data["store_id"])
-        is_holiday = int(data["is_holiday"])
-        is_weekend = int(data["is_weekend"])
-        is_promo = int(data["is_promo"])
-        competition_distance = float(data["competition_distance"])
-        competition_open_since_month = int(data["competition_open_since_month"])
-        competition_open_since_year = int(data["competition_open_since_year"])
-
-        # Create input features as an array
-        input_data = np.array([[store_id, is_holiday, is_weekend, is_promo,
-                                competition_distance, competition_open_since_month, 
-                                competition_open_since_year]])
-
-         # Make predictions using models
-        rf_prediction = loaded_rf_model.predict(input_data) if loaded_rf_model else None
-        lstm_prediction = loaded_lstm_model.predict(input_data) if loaded_lstm_model else None
-        # Prepare the response
-        response = {
-            "rf_prediction": rf_prediction.tolist() if rf_prediction is not None else None,
-            "lstm_prediction": lstm_prediction.tolist() if lstm_prediction is not None else None
-        }
-
-         # Create a plot for the LSTM model prediction
-        plt.figure(figsize=(10, 6))
-        plt.plot(y_val_pred, label='LSTM Prediction')
-        plt.plot(y_val, label='Actual')
-        plt.xlabel('Time')
-        plt.ylabel('Sales')
-        plt.title('LSTM Model Prediction vs Actual')
-        plt.legend()
-        plt.savefig('lstm_prediction_plot.png')
-
-        # Create a plot for the Random Forest model prediction
-        plt.figure(figsize=(10, 6))
-        plt.plot(y_pred_rf, label='Random Forest Prediction')
-        plt.plot(y_val, label='Actual')
-        plt.xlabel('Time')
-        plt.ylabel('Sales')
-        plt.title('Random Forest Model Prediction vs Actual')
-        plt.legend()
-        plt.savefig('random_forest_prediction_plot.png')
-
-        return jsonify(response)
-
-    except Exception as e:
-        return jsonify({"error": str(e)})
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+if __name__ == '__main__':
+    app.run(debug=True)
