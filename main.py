@@ -1,7 +1,10 @@
 import os
+import mlflow
+print(mlflow.__version__)
+
 import warnings
 import sys
-import pickle  # Add this import
+import pickle
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
@@ -16,6 +19,7 @@ from urllib.parse import urlparse
 import mypro
 from mlflow.models import infer_signature
 import mlflow.sklearn
+import mlflow
 
 import logging
 
@@ -23,13 +27,17 @@ logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger(__name__)
 
 # Load your merged train and test data
-train_data_merged = pd.read_csv("train_df.csv")
-test_data_merged = pd.read_csv("test_df.csv")
+train_data_merged = pd.read_csv(r"C:\Users\manil\ROSSMAN_SALES_PREDICTION_BY_MANILA\train_df.csv")
+test_data_merged = pd.read_csv(r"C:\Users\manil\ROSSMAN_SALES_PREDICTION_BY_MANILA\test_df.csv")
 
+print(test_data_merged.columns)
 train_data_merged.drop('SalesClass', axis=1, inplace=True)
 
 train_data_merged['Date'] = pd.to_datetime(train_data_merged['Date'])
 test_data_merged['Date'] = pd.to_datetime(test_data_merged['Date'])
+
+print(train_data_merged.info())
+print(test_data_merged.info())
 
 # Define X and y
 X = train_data_merged[['Store', 'DayOfWeek', 'Open', 'Promo', 'StateHoliday', 'SchoolHoliday',
@@ -55,7 +63,6 @@ X_test_lstm = X_test_scaled.reshape(X_test_scaled.shape[0], 1, X_test_scaled.sha
 # Initialize MLflow
 mlflow.set_experiment('Sales_Prediction')
 
-
 # Define the LSTM model
 lstm_model = Sequential()
 lstm_model.add(LSTM(units=50, activation='relu', input_shape=(X_train_lstm.shape[1], X_train_lstm.shape[2])))
@@ -78,17 +85,6 @@ with mlflow.start_run(run_name='LSTM'):
     mlflow.log_params({'epochs': 10, 'batch_size': 64})
     mlflow.log_metric('mse', mse)
 
-
-
-# Save the LSTM model using pickle
-model_filename = 'lstm_model.pkl'
-with open(model_filename, 'wb') as f:
-    pickle.dump(lstm_model, f)
-
-# Create a directory to save the models if it doesn't exist
-if not os.path.exists('saved_models'):
-    os.makedirs('saved_models')
-
 # Save the LSTM model with a timestamp
 timestamp = pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')
 model_filename_with_timestamp = f'lstm_model_{timestamp}.pkl'
@@ -102,11 +98,11 @@ test_data_merged['Date'] = pd.to_datetime(test_data_merged['Date'])
 
 # Extract the features from the test data (similar to what you did for training data)
 X_test = test_data_merged[['Store', 'DayOfWeek', 'Open', 'Promo', 'StateHoliday', 'SchoolHoliday',
-                   'StoreType', 'Assortment', 'CompetitionDistance',
-                   'CompetitionOpenSinceMonth', 'CompetitionOpenSinceYear', 'Promo2',
-                   'Promo2SinceWeek', 'Promo2SinceYear', 'PromoInterval', 'weekday',
-                   'is_weekend', 'Season', 'IsBeginningOfMonth',
-                   'IsMidOfMonth', 'IsEndOfMonth', 'DaysToHoliday', 'DaysAfterHoliday']]
+               'StoreType', 'Assortment', 'CompetitionDistance',
+               'CompetitionOpenSinceMonth', 'CompetitionOpenSinceYear', 'Promo2',
+               'Promo2SinceWeek', 'Promo2SinceYear', 'PromoInterval', 'weekday',
+               'is_weekend', 'Season', 'IsBeginningOfMonth',
+               'IsMidOfMonth', 'IsEndOfMonth', 'DaysToHoliday', 'DaysAfterHoliday']]
 
 # Normalize the input features using Min-Max scaling
 X_test_scaled = scaler.transform(X_test)
@@ -117,54 +113,42 @@ X_test_lstm = X_test_scaled.reshape(X_test_scaled.shape[0], 1, X_test_scaled.sha
 # Use the trained LSTM model to make predictions
 y_test_pred = lstm_model.predict(X_test_lstm)
 
-# Create a new DataFrame for test predictions
-test_predictions_df = pd.DataFrame({'Date': test_data_merged['Date'], 'PredictedSalesPerCustomer': y_test_pred.flatten()})
+# Add the Sales Prediction column to the test data
+test_data_merged['SalesPrediction'] = y_test_pred
 
-# Save the test predictions DataFrame to a CSV file
-test_predictions_df.to_csv(r"C:\Users\manil\ROSSMAN_SALES_PREDICTION_BY_MANILA\test_df.csv", index=False)
-# Merge the predictions DataFrame with the original test data
-test_data_with_predictions = test_data.merge(test_predictions_df, on='Date', how='left')
-# Save the merged test data with predictions to a CSV file
-test_data_with_predictions.to_csv("test_data_with_predictions.csv", index=False)
+# Save the test data with the Sales Prediction column
+test_data_merged.to_csv("test_data_with_predictions.csv", index=False)
+print('Test data with Sales Prediction saved successfully.')
+
+# Specify the experiment's name or ID where you want to log the artifact
 experiment_name_or_id = 'Sales_Prediction'
 
-# Log the merged test data with predictions as an artifact
-mlflow.set_experiment(experiment_name_or_id)
-mlflow.log_artifact("test_data_with_predictions.csv")
-# Specify the experiment's name or ID where you want to log the artifact
-experiment_name_or_id = 'Your_Experiment_Name_or_ID'
+# Set the MLflow tracking URI (replace with your MLflow server URL)
+mlflow.set_tracking_uri("http://localhost:5000")  # Replace with your MLflow server URL
 
-# Log the merged test data with predictions as an artifact
-mlflow.set_experiment(experiment_name_or_id)
-mlflow.log_artifact("test_data_with_predictions.csv")
-mlflow.set_tracking_uri("https://your-mlflow-server")
+
+# Set the artifact URI to store artifacts in S3 (if desired)
 mlflow.tracking.artifact_uri = "s3://your-s3-bucket/path/to/artifacts"
+
+# Log the test data with predictions as an artifact
+mlflow.log_artifact("test_data_with_predictions.csv")
 
 # Generate plots to visualize the predictions
 import matplotlib.pyplot as plt
 
 plt.figure(figsize=(12, 6))
-plt.plot(test_predictions_df['Date'], test_predictions_df['PredictedSalesPerCustomer'], label='Predicted SalesPerCustomer', color='blue')
-plt.title('Predicted Sales Per Customer Over Time')
+plt.plot(test_data_merged['Date'], test_data_merged['SalesPrediction'], label='Predicted Sales', color='blue')
+plt.title('Predicted Sales Over Time')
 plt.xlabel('Date')
-plt.ylabel('Predicted SalesPerCustomer')
+plt.ylabel('Predicted Sales')
 plt.legend()
 plt.grid(True)
 
 # Save the plot as an image file (optional)
-plt.savefig("predicted_sales_per_customer_plot.png")
+plt.savefig("predicted_sales_plot.png")
 
-# Show the plot without blocking the script
-plt.show(block=False)
-
-
-
-
-# Log the image and CSV file as artifacts
-mlflow.log_artifact("predicted_sales_per_customer_plot.png", artifact_path="plots")
-mlflow.log_artifact("test_data_with_predictions.csv", artifact_path="data")
+# Log the image and CSV file as artifacts with the correct paths
+mlflow.log_artifact("predicted_sales_plot.png", artifact_path="plots")
 
 # Show the plot
 plt.show()
-
-
