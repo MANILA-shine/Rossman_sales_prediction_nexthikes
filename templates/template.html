@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ROSSMAN SALES PREDICTION FOR NEXT 6 MONTHS</title>
+    <style>
+        /* Set background image */
+        body {
+            background-image: url('/static/background.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Fixed background */
+            background-position: center; /* Center the background image */
+            background-color: rgba(255, 255, 255, 1); /* Fully opaque white background */
+            color: black; /* Text color */
+        }
+
+        /* Style for the main container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content vertically */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Style for the left side (predicted sales) */
+        .left-side {
+            padding: 20px;
+        }
+
+        /* Style for the predicted sales list */
+        .predicted-sales {
+            list-style: none; /* Remove bullet points */
+            padding: 0; /* Remove padding */
+            font-weight: bold; /* Make the text bold */
+        }
+
+        /* Style for the plot image */
+        .plot-image {
+            max-width: 100%; /* Adjust the plot image size */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="left-side">
+            <h1>Predicted Sales:</h1>
+            <ul class="predicted-sales">
+                {% for prediction in predictions %}
+                    <li>{{ prediction }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="right-side">
+            <h1>ROSSMAN SALES PREDICTION PLOT</h1>
+            <img class="plot-image" src="/static/sales_plot.png" alt="Sales Prediction Plot">
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+

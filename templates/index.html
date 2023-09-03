@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Predictions</title>
+</head>
+<body>
+    <h1>Sales Predictions</h1>
+    <h2>Predicted Sales Per Customer</h2>
+    <div>
+        {{ predictions | safe }}
+    </div>
+    <h2>Predicted Sales Per Customer Plot</h2>
+    <div>
+        <img src="data:image/png;base64,{{ plot_data }}" alt="Predicted Sales Per Customer Plot">
+    </div>
+</body>
+</html>
